@@ -5,7 +5,6 @@ import (
 
 	logger "github.com/wawakakakyakya/GolangLogger"
 	"github.com/wawakakakyakya/check_logs_by_mail/config"
-	"github.com/wawakakakyakya/check_logs_by_mail/smtp"
 )
 
 type File struct {
@@ -26,7 +25,7 @@ func (f *File) IsRotated(path string) (bool, error) {
 	return f.PosFile.Inode != inode, nil
 }
 
-func (f *File) Parse(path string, logparser *LogParser, mailQueue chan *smtp.SMTPData) (int64, bool, error) {
+func (f *File) Parse(path string, logparser *LogParser) (int64, bool, error) {
 	var readSize int
 	var rotated bool
 	var err error
@@ -46,7 +45,7 @@ func (f *File) Parse(path string, logparser *LogParser, mailQueue chan *smtp.SMT
 		}
 		//ローテーションされたファイルなので、ポジションには含めない
 		f.logger.DebugF("%s was rorated, load old file: %s", path, rotateFile)
-		_, _, err = f.Parse(rotateFile, logparser, mailQueue)
+		_, _, err = f.Parse(rotateFile, logparser)
 		if err != nil {
 			return 0, false, err
 		}
@@ -62,7 +61,7 @@ func (f *File) Parse(path string, logparser *LogParser, mailQueue chan *smtp.SMT
 
 	fp.Seek(f.PosFile.LastLine, 0)
 	f.logger.DebugF("move to lastline(%d) in %s", f.PosFile.LastLine, path)
-	readSize, err = logparser.Parse(fp, path, f.Config.Words, mailQueue)
+	readSize, err = logparser.Parse(fp, path, f.Config.Words)
 
 	return int64(readSize), rotated, err
 }

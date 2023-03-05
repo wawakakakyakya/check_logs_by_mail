@@ -33,7 +33,8 @@ func main() {
 	defer close(mailQueue)
 	logger.Debug("add mail waitgroup")
 	mailWg.Add(1)
-	go smtp.Main(config.GlobalConfig.SMTP, mailQueue, mailCtx, logger, &mailWg)
+	//config <> smtpの依存関係はここで切り離す
+	go smtp.Main(config.GlobalConfig.SMTP.Host, config.GlobalConfig.SMTP.Port, config.GlobalConfig.SMTP.UserName, config.GlobalConfig.SMTP.PassWord, config.GlobalConfig.SMTP.Timeout, config.GlobalConfig.SMTP.From, mailQueue, mailCtx, logger, &mailWg)
 	for _, f := range config.Files {
 		wg.Add(1)
 		logger.Debug("add waitgroup")

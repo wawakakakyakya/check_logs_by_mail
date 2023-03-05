@@ -6,7 +6,6 @@ import (
 
 	logger "github.com/wawakakakyakya/GolangLogger"
 	"github.com/wawakakakyakya/check_logs_by_mail/config"
-	"github.com/wawakakakyakya/check_logs_by_mail/smtp"
 )
 
 type LogParser struct {
@@ -15,7 +14,7 @@ type LogParser struct {
 	maxLine int
 }
 
-func (l *LogParser) Parse(fp io.Reader, fileName string, words []*config.WordConfig, mailQueue chan *smtp.SMTPData) (int, error) {
+func (l *LogParser) Parse(fp io.Reader, fileName string, words []*config.WordConfig) (int, error) {
 
 	var err error
 	readSize := 0
@@ -37,9 +36,9 @@ func (l *LogParser) Parse(fp io.Reader, fileName string, words []*config.WordCon
 		l.logger.DebugF("readSize(%s): %d", fileName, readSize)
 		for _, wc := range words {
 			if wc.Regexp.Match(line) {
-				l.logger.InfoF("line: %s", string(line))
-				mailQueue <- smtp.NewSMTPData(wc.Recipients, wc.Subject, line)
-				l.logger.InfoF("file:%s, line was matched: %s", fileName, line)
+				ls := string(line)
+				wc.SMTPData.AddMsg(ls)
+				l.logger.WarnF("file:%s, line was matched: %s", fileName, line)
 				isMatched = true
 			}
 		}

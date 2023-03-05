@@ -1,6 +1,10 @@
 package config
 
-import "regexp"
+import (
+	"regexp"
+
+	"github.com/wawakakakyakya/check_logs_by_mail/smtp"
+)
 
 type FileConfig struct {
 	FileName string        `yaml:"fileName"`
@@ -15,4 +19,5 @@ type WordConfig struct {
 	Subject       string   `yaml:"subject"`
 	Recipients    []string `yaml:"recipients"`
 	Regexp        *regexp.Regexp
+	SMTPData      *smtp.SMTPData
 }

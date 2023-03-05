@@ -131,7 +131,7 @@ func (s *SMTPClient) Send(data *SMTPData) error {
 	// auth := smtp.CRAMMD5Auth(s.userName, s.password)
 	mailRes := make(chan error)
 	defer close(mailRes)
-
+	s.logger.DebugF("body: %s", data.Body())
 	go func() {
 		mailRes <- s.send(s.hostName, s.port, s.from, data.recipients, data.Body())
 	}()
